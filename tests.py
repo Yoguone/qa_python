@@ -23,46 +23,43 @@ class TestBooksCollector:
         # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
         assert len(collector.get_books_genre()) == 2
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'] )
-    def test_set_book_genre_if_book_genre_in_genre_list(self,genre):
+    @pytest.mark.parametrize('valid_genre', ['Фантастика', 'Ужасы', 'Мультфильмы', 'Комедии'])
+    def test_set_book_genre_if_book_genre_in_genre_list(self,valid_genre):
         collector = BooksCollector()
         collector.add_new_book('Оно')
-        collector.set_book_genre('Оно', 'Ужасы')
-        assert collector.books_genre['Оно'] == 'Ужасы'
+        collector.set_book_genre('Оно', valid_genre)
+        assert collector.books_genre['Оно'] in collector.genre
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_set_book_genre_if_book_genre_not_in_genre_list(self,genre):
+
+    @pytest.mark.parametrize('invalid_genre', ['Аниме', 'Киберпанк', 'Байопик'])
+    def test_set_book_genre_if_book_genre_not_in_genre_list(self,invalid_genre):
         collector = BooksCollector()
         collector.add_new_book('Акира')
-        collector.set_book_genre('Акира', 'Аниме')
+        collector.set_book_genre('Акира', invalid_genre)
         assert collector.books_genre['Акира'] == ''
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_get_book_genre_if_book_in_book_genre_list(self, genre):
+    @pytest.mark.parametrize('valid_genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
+    def test_get_book_genre_if_book_in_book_genre_list(self, valid_genre):
         collector = BooksCollector()
         collector.add_new_book('Оно')
-        collector.set_book_genre('Оно', 'Ужасы')
-        assert collector.get_book_genre('Оно') == 'Ужасы'
+        collector.set_book_genre('Оно', valid_genre)
+        assert collector.get_book_genre('Оно') == valid_genre
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_get_book_genre_if_book_genre_not_in_genre_list(self, genre):
+    @pytest.mark.parametrize('invalid_genre', ['Аниме', 'Киберпанк', 'Байопик'])
+    def test_get_book_genre_if_book_genre_not_in_genre_list(self, invalid_genre):
         collector = BooksCollector()
         collector.add_new_book('Акира')
-        collector.set_book_genre('Акира', 'Аниме')
+        collector.set_book_genre('Акира', invalid_genre)
         assert collector.get_book_genre('Акира') == ''
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_get_books_with_specific_genre_if_books_genre_in_genre_list(self,genre):
+    @pytest.mark.parametrize('valid_genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
+    def test_get_books_with_specific_genre_if_books_genre_in_genre_list(self,valid_genre):
         collector = BooksCollector()
-        collector.books_with_specific_genre = []
         collector.add_new_book('Оно')
         collector.add_new_book('Акира')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Акира', 'Мультфильмы')
-        for name, genre in collector.books_genre.items():
-            if genre in 'Ужасы''Мультфильмы':
-                collector.books_with_specific_genre.append(name)
-        assert collector.get_books_with_specific_genre('Ужасы') == ['Оно']
+        collector.set_book_genre('Оно', valid_genre)
+        collector.set_book_genre('Акира', valid_genre)
+        assert collector.get_books_with_specific_genre(valid_genre) == ['Оно', 'Акира']
 
     def test_get_books_genre_if_book_genre_in_genre_list(self):
         collector = BooksCollector()
@@ -80,84 +77,52 @@ class TestBooksCollector:
         collector.set_book_genre('Акира', 'Аниме')
         assert collector.books_genre == {'Оно': 'Ужасы', 'Акира': ''}
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_get_books_for_children_if_book_not_in_genre_age_rating(self, genre):
+    def test_get_books_for_children_if_book_not_in_genre_age_rating(self):
         collector = BooksCollector()
-        collector.books_for_children = []
         collector.add_new_book('Вавилон 5')
         collector.add_new_book('Акира')
         collector.set_book_genre('Вавилон 5', 'Фантастика')
         collector.set_book_genre('Акира', 'Мультфильмы')
-        for name, genre in collector.books_genre.items():
-            if genre not in  collector.genre_age_rating:
-                collector.books_for_children.append(name)
         assert collector.get_books_for_children() == ['Вавилон 5','Акира']
 
-    @pytest.mark.parametrize('genre', ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
-    def test_get_books_for_children_if_book_in_genre_age_rating(self,genre):
-        books_for_children = []
+    def test_get_books_for_children_if_book_in_genre_age_rating(self):
         collector = BooksCollector()
         collector.add_new_book('Оно')
         collector.add_new_book('Акира')
         collector.set_book_genre('Оно', 'Ужасы')
         collector.set_book_genre('Акира', 'Мультфильмы')
-        for name, genre in collector.books_genre.items():
-            if genre not in collector.genre_age_rating:
-                books_for_children.append(name)
         assert collector.get_books_for_children() == ['Акира']
-
 
     def test_add_book_in_favorites_if_book_in_books_genre_list(self):
         collector = BooksCollector()
         collector.add_new_book('Оно')
         collector.add_new_book('Акира')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Акира', 'Мультфильмы')
-        for name, genre in collector.books_genre.items():
-            if name in collector.books_genre:
-                collector.favorites.append(name)
-        assert collector.favorites == ['Оно', 'Акира']
+        collector.add_book_in_favorites('Оно')
+        collector.add_book_in_favorites('Акира')
+        assert collector.favorites == ['Оно','Акира']
 
-    def test_add_book_in_favorites_if_book_not_in_books_genre_list(self):
+    def test_add_book_in_favorites_if_book_is_already_in_favorites(self):
         collector = BooksCollector()
         collector.add_new_book('Оно')
         collector.add_new_book('Акира')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Акира', 'Аниме')
-        for name, genre in collector.books_genre.items():
-            if name in collector.books_genre:
-                collector.favorites.append(name)
-        assert collector.favorites == ['Оно', 'Акира']
-
-    def test_add_book_in_favorites_if_book_already_in_favorites(self):
-        collector = BooksCollector()
-        collector.add_new_book('Оно')
-        collector.add_new_book('Акира')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Акира', 'Аниме')
-        for name, genre in collector.books_genre.items():
-            if name in collector.books_genre and name not in collector.favorites:
-                collector.favorites.append(name)
+        collector.add_book_in_favorites('Оно')
+        collector.add_book_in_favorites('Акира')
         collector.add_book_in_favorites('Оно')
         assert collector.favorites == ['Оно', 'Акира']
 
     def test_delete_book_from_favorites_book_in_favorites_list(self):
         collector = BooksCollector()
         collector.add_new_book('Оно')
-        collector.add_new_book('Акира')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Акира', 'Аниме')
-        for name, genre in collector.books_genre.items():
-            if name in collector.books_genre and name not in collector.favorites:
-                collector.favorites.append(name)
         collector.add_book_in_favorites('Оно')
         collector.delete_book_from_favorites('Оно')
-        assert 'Оно' not in collector.favorites
+        assert collector.favorites == []
 
     def test_get_list_of_favorites_books_get_list(self):
         collector = BooksCollector()
         collector.add_new_book('Оно')
+        collector.add_new_book('Акира')
         collector.add_book_in_favorites('Оно')
-        assert collector.get_list_of_favorites_books() == ['Оно']
+        collector.add_book_in_favorites('Акира')
+        assert collector.get_list_of_favorites_books() == ['Оно','Акира']
 
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
